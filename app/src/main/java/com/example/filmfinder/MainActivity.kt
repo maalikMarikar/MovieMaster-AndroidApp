@@ -87,7 +87,7 @@ fun GUI(movieDao: MovieDao){
         }
 
         if(myMovies.isNotEmpty()){
-            Text(text = myMovies.get(0).toString())
+
         }
     }
 }
