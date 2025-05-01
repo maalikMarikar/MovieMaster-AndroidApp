@@ -18,4 +18,7 @@ interface MovieDao {
 
     @Query("DELETE FROM movie WHERE Title LIKE :title")
     suspend fun deleteById(title: String)
+
+    @Query("SELECT * FROM movie WHERE Title LIKE :title")
+    suspend fun getByTitle(title: String): Movie
 }
