@@ -21,4 +21,8 @@ interface MovieDao {
 
     @Query("SELECT * FROM movie WHERE Title LIKE :title")
     suspend fun getByTitle(title: String): Movie
+
+    @Query("SELECT * FROM movie WHERE LOWER(Actors) LIKE LOWER(:actorName)")
+    suspend fun getByActor(actorName: String): List<Movie>
+
 }

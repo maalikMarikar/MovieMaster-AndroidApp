@@ -2,6 +2,7 @@ package com.example.filmfinder
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity
 data class Movie(
@@ -16,4 +17,4 @@ data class Movie(
     var Writer: String?,
     var Actors: String?,
     var Plot: String?
-)
+) : Serializable
