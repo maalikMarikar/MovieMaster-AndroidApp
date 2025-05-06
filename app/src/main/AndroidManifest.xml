@@ -27,6 +27,8 @@
         <activity android:name=".MovieFinderScreen"></activity>
         <activity android:name=".ActorFinderScreen"></activity>
         <activity android:name=".HardCodedMovie"></activity>
+        <activity android:name=".WatchLater"></activity>
+        <activity android:name=".PartialTitleFinder"></activity>
     </application>
 
 </manifest>

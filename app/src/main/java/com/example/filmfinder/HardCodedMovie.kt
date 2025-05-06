@@ -127,6 +127,7 @@ fun GUI_HardCodedMovie(movieDao: MovieDao, sharedPref: android.content.SharedPre
     var displayMovies by rememberSaveable { mutableStateOf(false) } // if true movie details are displayed
 
     var movies by rememberSaveable { mutableStateOf(mutableListOf<Movie>()) }
+    var moviesFromDB by rememberSaveable { mutableStateOf(mutableListOf<Movie>()) }
 
     Column(
         Modifier.fillMaxSize().background(color = Color.Gray).padding(5.dp),
@@ -163,15 +164,11 @@ fun GUI_HardCodedMovie(movieDao: MovieDao, sharedPref: android.content.SharedPre
                                 sharedPref.edit().putBoolean("mvAdded", moviesAdded).apply()
                                 displayMovies = false
                             }
-
-
                         }
                         else{
                             showDialog.value = true
                         }
                     }
-
-
                 }
             ) {
                 Text("Add")
@@ -184,25 +181,18 @@ fun GUI_HardCodedMovie(movieDao: MovieDao, sharedPref: android.content.SharedPre
                 onClick = {
                     scope.launch {
 
-//                        val shawShank = movieDao.getByTitle("The Shawshank Redemption")
-//                        movies.add(shawShank)
-//                        val darkKnight = movieDao.getByTitle("Batman: The Dark Knight Returns, Part 1")
-//                        movies.add(darkKnight)
-//                        val lordOfTheRings = movieDao.getByTitle("The Lord of the Rings: The Return of the King")
-//                        movies.add(lordOfTheRings)
-//                        val Inception = movieDao.getByTitle("Inception")
-//                        movies.add(Inception)
-//                        val matrix = movieDao.getByTitle("The Matrix")
-//                        movies.add(matrix)
-
-                        movies = movieDao.getSavedMovies().toMutableList()
-
+                        val shawShank = movieDao.getByTitle("The Shawshank Redemption")
+                        movies.add(shawShank)
+                        val darkKnight = movieDao.getByTitle("Batman: The Dark Knight Returns, Part 1")
+                        movies.add(darkKnight)
+                        val lordOfTheRings = movieDao.getByTitle("The Lord of the Rings: The Return of the King")
+                        movies.add(lordOfTheRings)
+                        val Inception = movieDao.getByTitle("Inception")
+                        movies.add(Inception)
+                        val matrix = movieDao.getByTitle("The Matrix")
+                        movies.add(matrix)
 
                         displayMovies = true
-
-
-
-
                     }
 
                 }
@@ -238,14 +228,15 @@ fun GUI_HardCodedMovie(movieDao: MovieDao, sharedPref: android.content.SharedPre
                 movies.forEach { m ->
 
                     Column(Modifier.padding(5.dp).border(2.dp, color = Color.Black).padding(5.dp)) {
-                        Text("🎬 ${m?.Title} (${m?.Year})", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("🎬 ${m?.Title}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("Rated: ${m?.Year}", fontWeight = FontWeight.Bold)
                         Text("Rated: ${m?.Rated}", fontWeight = FontWeight.Bold)
                         Text("Released: ${m?.Released}", fontWeight = FontWeight.Bold)
                         Text("Runtime: ${m?.Runtime}", fontWeight = FontWeight.Bold)
                         Text("Genre: ${m?.Genre}", fontWeight = FontWeight.Bold)
                         Text("Director: ${m?.Director}", fontWeight = FontWeight.Bold)
                         Text("Writer: ${m?.Writer}", fontWeight = FontWeight.Bold)
-                        Text("Actors: ${m?.Actors}", fontWeight = FontWeight.Bold)
+                        Text("Actors: ${m?.Actors}\n", fontWeight = FontWeight.Bold)
                         Text("Plot: ${m?.Plot}", fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(16.dp))
                     }
@@ -253,6 +244,12 @@ fun GUI_HardCodedMovie(movieDao: MovieDao, sharedPref: android.content.SharedPre
             }
         }
 
+        scope.launch {
+            //moviesFromDB = movieDao.getSavedMovies().toMutableList()
+            if(movieDao.getSavedMovies().toMutableList().isEmpty()){
+                moviesAdded = false
+            }
+        }
 
 
     }
@@ -262,11 +259,13 @@ fun GUI_HardCodedMovie(movieDao: MovieDao, sharedPref: android.content.SharedPre
 fun ShowPopUpWindow(showDialog: MutableState<Boolean>){
     AlertDialog(
         onDismissRequest = { showDialog.value = false},
-        title = {Text("Movie Already Added ⚠\uFE0F")},
-        text = { Text("Cannot add since a movie already exists in the Database!")},
+        title = {Text("Movies Already Added ⚠\uFE0F")},
+        text = { Text("Cannot add since above movies already exist in the Database!")},
         confirmButton = {
-            Button(onClick = {showDialog.value = false}){
-                Text("Close")
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Button(onClick = {showDialog.value = false}){
+                    Text("Close")
+                }
             }
         }
     )

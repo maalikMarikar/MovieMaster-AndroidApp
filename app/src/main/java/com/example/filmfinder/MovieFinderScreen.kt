@@ -56,6 +56,7 @@ class MovieFinderScreen: ComponentActivity() {
 @Composable
 fun GUI_MovieFinder(movieDao: MovieDao){
     var testM by rememberSaveable { mutableStateOf("") }
+    var enableBtn by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var movieInput by rememberSaveable { mutableStateOf("") }
     var movieOutput by rememberSaveable { mutableStateOf<Movie?>(null) }
@@ -73,7 +74,7 @@ fun GUI_MovieFinder(movieDao: MovieDao){
             OutlinedTextField(
                 value = movieInput,
                 onValueChange = {movieInput = it},
-                label = { Text("Enter Movie Name Here ")}
+                label = { Text("Movie Name")}
             )
 
             Row (
@@ -86,6 +87,7 @@ fun GUI_MovieFinder(movieDao: MovieDao){
                             movieOutput = findMovie(movieInput)
                             searchClicked = true
                         }
+
                     }
                 ) {
                     Text("Search")
@@ -94,15 +96,16 @@ fun GUI_MovieFinder(movieDao: MovieDao){
                 Spacer(Modifier.width(8.dp))
 
                 Button(
+                    enabled = enableBtn,
                     onClick = {
                         scope.launch {
                             var checkIfInserted = movieDao.getByTitle(movieOutput!!.Title)
                             if(checkIfInserted!=null){
-                                testM = "cant add!"
+                                testM = "Movie already inserted ⚠\uFE0F"
                             }
                             else{
                             movieDao.insertMovie(movieOutput!!)
-                            testM = "added"
+                            testM = "Movie added :)"
                             }
                         }
                     }
@@ -123,8 +126,14 @@ fun GUI_MovieFinder(movieDao: MovieDao){
             )
         ){
             if(movieOutput!=null){
+                enableBtn = true
+            }
+            else{
+                enableBtn = false
+            }
+
+            if(movieOutput!=null){
                 val movieInfo = listOf(
-                    "Title" to movieOutput!!.Title.toString(),
                     "Year" to movieOutput!!.Year.toString(),
                     "Rated" to movieOutput!!.Rated.toString(),
                     "Release date" to movieOutput!!.Released.toString(),
@@ -134,25 +143,25 @@ fun GUI_MovieFinder(movieDao: MovieDao){
                     "Writer(s)" to movieOutput!!.Writer.toString(),
                     "Actor(s)" to movieOutput!!.Actors.toString()
                 )
-
+                Text(text = "\uD83C\uDFAC Title: ${movieOutput!!.Title.toString()}", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
+                Spacer(Modifier.height(5.dp))
                 movieInfo.forEach { (label, value) ->
                     Row {
                         Text(text = "$label: ", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
                         Text(text = value, style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
                     }
-                    Spacer(Modifier.height(6.dp))
+                    Spacer(Modifier.height(5.dp))
                 }
-
-
-                Text(text = "Plot", modifier = Modifier.fillMaxWidth(), style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp, textAlign = TextAlign.Center))
-                Text(text = movieOutput!!.Plot.toString(), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                Spacer(Modifier.height(10.dp))
+                Text(text = "Plot: ${movieOutput!!.Plot.toString()}", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
             }
             else if(movieOutput==null && searchClicked){
+                testM = ""
                 Text(text = "No results found ⚠\uFE0F", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 15.sp))
             }
-            //Text(text = movieOutput, style = TextStyle(fontSize = 18.sp))
         }
-        Text(testM)
+        Spacer(Modifier.height(8.dp))
+        Text(text = testM, style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold))
     }
 
 }
